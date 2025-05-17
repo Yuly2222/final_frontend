@@ -309,8 +309,7 @@ function calculateTotalPrice() {
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 document.addEventListener("DOMContentLoaded", () => {
-  const apiUrl = "https://script.googleusercontent.com/macros/echo?user_content_key=AehSKLhBzw-nzs3vZpSPJno-b1qPpNAKlomOrvlSnHMjeA_eJ6_X9XsVvh3FiUZxMMd3huJB9kbqmA98hSywXrZNUDyhQdpyRVMgyP0AAw1ijYXiEzv6AT5__gBV6TWaTRB97L5cMUYQ5yCa2wmXvKT6IAiAMAoX-hfiVFXM15dGB1YIf8hyXTkc6vj9NF8EoaTxdNLQlC053Zeqtem71xgTT4iIWXpKcsVw-KApC4B5OhRYq6USI8s49TxXTr3OK_5uGwX7nluNiRtq_Xd7AUrdYO613oyarw&lib=MODKcEcOcTwDb5jwiLy02M1CpcznXvU-Y";
-
+  const apiUrl = "https://final-backend2-20lz.onrender.com/app1/menu/";
   const categoryMap = {
       burger: "burgers",
       dessert: "desserts",
@@ -325,8 +324,8 @@ document.addEventListener("DOMContentLoaded", () => {
   fetch(apiUrl)
       .then(response => response.json())
       .then(json => {
-          const items = json.data;
-          console.log("Datos recibidos:", items); // <-- Para depuración
+          const items = json.data || json.items || json; 
+          console.log("Datos recibidos:", items);
 
           if (!items || items.length === 0) {
               console.error("No data returned from API.");
@@ -334,23 +333,31 @@ document.addEventListener("DOMContentLoaded", () => {
               return;
           }
 
-          // Si hay menos de 5 elementos, usa todos como dishes y no muestres leaders
+          // SEPARAR leaders (los que tienen name vacío o price 0) y dishes
           let leaders = [];
-          let dishes = items;
-          if (items.length > 4) {
-              leaders = items.slice(-4);
-              dishes = items.slice(0, items.length - 4);
-          }
+          let dishes = [];
 
+          items.forEach(item => {
+            // Si el item está vacío en nombre y precio es 0, es leader
+            if (
+              (!item.name || item.name.trim() === "") &&
+              (item.price === "0.00" || item.price === 0 || item.price === "0")
+            ) {
+              leaders.push(item);
+            } else {
+              dishes.push(item);
+            }
+          });
+
+          // AGRUPAR dishes por categoría
           const dishesByCategory = {};
           dishes.forEach(dish => {
-              const key = categoryMap[dish.categoria?.toLowerCase()] || dish.categoria?.toLowerCase() || "otros";
+              const key = categoryMap[dish.category?.toLowerCase()] || dish.category?.toLowerCase() || "otros";
               if (!dishesByCategory[key]) {
                   dishesByCategory[key] = [];
               }
               dishesByCategory[key].push(dish);
           });
-
 
           loadingMessage.style.display = "none";
 
@@ -361,52 +368,46 @@ document.addEventListener("DOMContentLoaded", () => {
                   filteredDishes.forEach(dish => {
                       const dishDiv = document.createElement("div");
                       dishDiv.classList.add("burger", category);
-                      dishDiv.dataset.name = dish.nombre;
+                      dishDiv.dataset.name = dish.name;
 
-                      // Convert price to number (removes $ and converts to float)
-                      const price = parseFloat(dish.precio.replace('$', ''));
+                      const price = parseFloat(dish.price.replace('$', ''));
                       dishDiv.dataset.price = price;
 
                       const img = document.createElement("img");
-                      img.src = dish.imagen;
-                      img.alt = dish.nombre;
+                      img.src = dish.image_link;
+                      img.alt = dish.name;
 
                       const h3 = document.createElement("h3");
-                      h3.textContent = dish.nombre;
+                      h3.textContent = dish.name;
 
                       dishDiv.appendChild(img);
                       dishDiv.appendChild(h3);
 
-                      // Description
-                      if (dish.descripcion && dish.descripcion.trim() !== "") {
+                      if (dish.description && dish.description.trim() !== "") {
                           const descriptionP = document.createElement("p");
-                          descriptionP.textContent = `Description: ${dish.descripcion.trim()}`;
+                          descriptionP.textContent = `Description: ${dish.description.trim()}`;
                           dishDiv.appendChild(descriptionP);
                       }
 
-                      // Ingredients
-                      if (dish.ingredientes && dish.ingredientes.trim() !== "") {
+                      if (dish.ingredients && dish.ingredients.trim() !== "") {
                           const ingredientsP = document.createElement("p");
-                          ingredientsP.textContent = `Ingredients: ${dish.ingredientes.trim()}`;
+                          ingredientsP.textContent = `Ingredients: ${dish.ingredients.trim()}`;
                           dishDiv.appendChild(ingredientsP);
                       }
 
-                      // Allergens (precaution with ingredients)
-                      if (dish.alergeno && dish.alergeno.trim() !== "") {
+                      if (dish.awareness && dish.awareness.trim() !== "") {
                           const allergensP = document.createElement("p");
-                          allergensP.textContent = `Precaution: Contains ${dish.alergeno.trim()}`;
+                          allergensP.textContent = `Precaution: Contains ${dish.awareness.trim()}`;
                           dishDiv.appendChild(allergensP);
                       }
 
-                      // Price
                       const priceLabel = document.createElement("p");
                       priceLabel.textContent = `Price: $${price.toFixed(2)}`;
                       dishDiv.appendChild(priceLabel);
 
-                      // Calories
-                      if (dish.calorias) {
+                      if (dish.calories) {
                           const caloriesP = document.createElement("p");
-                          caloriesP.textContent = `Calories: ${dish.calorias}`;
+                          caloriesP.textContent = `Calories: ${dish.calories}`;
                           dishDiv.appendChild(caloriesP);
                       }
 
@@ -422,25 +423,25 @@ document.addEventListener("DOMContentLoaded", () => {
               }
           }
 
-          // Mostrar SIEMPRE todas las categorías como botones, usando la imagen del leader si existe
+          // Mostrar siempre todas las categorías como botones, con imagen líder si existe
           const categories = Object.keys(dishesByCategory);
 
           categories.forEach(catKey => {
-              // Busca si hay un leader para esta categoría
+              // Buscar líder correspondiente a la categoría
               let leader = leaders.find(l =>
-                  (l.categoria?.toLowerCase() === catKey) ||
-                  (catKey === "burgers" && l.categoria?.toLowerCase() === "burger") ||
-                  (catKey === "desserts" && l.categoria?.toLowerCase() === "dessert") ||
-                  (catKey === "drinks" && l.categoria?.toLowerCase() === "drink")
+                  (l.category?.toLowerCase() === catKey) ||
+                  (catKey === "burgers" && l.category?.toLowerCase() === "burger") ||
+                  (catKey === "desserts" && l.category?.toLowerCase() === "dessert") ||
+                  (catKey === "drinks" && l.category?.toLowerCase() === "drink") ||
+                  (catKey === "fast" && l.category?.toLowerCase() === "fast")
               );
 
               const div = document.createElement("div");
               div.classList.add(catKey);
 
-              // Si hay leader, muestra imagen, si no, solo el botón
-              if (leader && leader.imagen) {
+              if (leader && leader.image_link) {
                   const img = document.createElement("img");
-                  img.src = leader.imagen;
+                  img.src = leader.image_link;
                   img.alt = "Category Image";
                   div.appendChild(img);
               }
@@ -456,7 +457,7 @@ document.addEventListener("DOMContentLoaded", () => {
               groupsContainer.appendChild(div);
           });
 
-          // Selecciona la categoría por defecto (la primera)
+          // Seleccionar categoría por defecto (la primera)
           const defaultCat = categories[0];
           renderDishes(defaultCat);
       })
@@ -544,55 +545,4 @@ document.addEventListener("DOMContentLoaded", () => {
       return total;
   }
 });
-
-// Function to fetch menu data
-async function fetchMenuData() {
-  try {
-      const response = await fetch('https://script.googleusercontent.com/macros/echo?user_content_key=AehSKLjpvPbjOX2q16HBV3u_pBYB_3yFwc6Ke4FubmuuUiQLHAfI2mauW0hnKXyQdWWvqcTnXgBE9LnixfIhYv_c-b8BH2yRz-DUiapEuyvuHdrPxyALEIYoga59pA6ikg3p3QB_hH3BJpVGxEoGvNus5inP3yOnuxthu_T9rQZcrKA04fEX1S0qGkVZnobm2Ltvl3n-TgJWybG69iZPNItVEgSnR-kicQJYs8Tbkbakn1njRFsRIOFDiru_iWQOGVVODGQI86H1UGezYJzpboWNApN4dkkICQ&lib=MODKcEcOcTwDb5jwiLy02M1CpcznXvU-Y');
-      if (!response.ok) {
-          throw new Error('Network response was not ok');
-      }
-      const menuData = await response.json();
-      return menuData;
-  } catch (error) {
-      console.error('Fetch error:', error);
-      return [];
-  }
-}
-
-// Example usage:
-fetchMenuData().then(menuData => {
-  // Process the menuData as needed
-  console.log(menuData);
-});
-
-// Function to fetch menu data
-async function fetchMenuData() {
-  try {
-      const response = await fetch('https://script.googleusercontent.com/macros/echo?user_content_key=AehSKLjpvPbjOX2q16HBV3u_pBYB_3yFwc6Ke4FubmuuUiQLHAfI2mauW0hnKXyQdWWvqcTnXgBE9LnixfIhYv_c-b8BH2yRz-DUiapEuyvuHdrPxyALEIYoga59pA6ikg3p3QB_hH3BJpVGxEoGvNus5inP3yOnuxthu_T9rQZcrKA04fEX1S0qGkVZnobm2Ltvl3n-TgJWybG69iZPNItVEgSnR-kicQJYs8Tbkbakn1njRFsRIOFDiru_iWQOGVVODGQI86H1UGezYJzpboWNApN4dkkICQ&lib=MODKcEcOcTwDb5jwiLy02M1CpcznXvU-Y');
-      if (!response.ok) {
-          throw new Error('Network response was not ok');
-      }
-      const menuData = await response.json();
-      return menuData;
-  } catch (error) {
-      console.error('Fetch error:', error);
-      return [];
-  }
-}
-
-// Function to initialize the chatbot
-function initializeChatbot(menuData) {
-  // Your existing chatbot initialization code
-
-  // Example: Use menuData to provide context to the chatbot
-  const menuItems = menuData.map(item => item.name).join(', ');
-  const initialMessage = `Hello! Here's our menu: ${menuItems}. How can I assist you today?`;
-  appendMessage(initialMessage, 'assistant');
-}
-
-// Initialize the chatbot with menu data
-fetchMenuData().then(menuData => {
-  initializeChatbot(menuData);
-});
-
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
