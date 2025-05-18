@@ -17,6 +17,9 @@
             <a href="#story">Our Story</a>
             <a href="#team-section">Contact Us</a>
             <a href="ulogin-register.html" class="login-btn">Login</a>
+            <span id="user-display"></span>
+            <button id="logout-btn" style="display:none; margin-left: 10px;">Logout</button>
+            <span id="user-display"></span>
         </nav>
     </header>
 
@@ -84,7 +87,7 @@
                 <input type="hidden" id="prices" name="prices" value="">
                 <input type="hidden" id="products" name="products" value="">
                 <button id="clear-cart">Clear Cart</button>
-                <button type="submit" id="action">Submit</button>
+                <button type="submit" id="submit-cart">Submit</button>
             </form>
             <script>
                 const deliveryUrl = "delivery.html";
@@ -103,6 +106,41 @@
             <button id="send-chat">Send</button>
         </div>
     </section>
+
+    
+    <div id= "login_container" class="container">
+        <button id="close-modal" type="button">Cerrar</button>
+        <a href="elogin-register.html" class="employee-link">Página de empleado</a>
+        <div class="tabs">
+            <div class="tab active" id="login-tab">Iniciar Sesión</div>
+            <div class="tab" id="register-tab">Registrarse</div>
+        </div>
+        <form id="login-form" class="active" autocomplete="off">
+            <h2>Iniciar Sesión Usuarios</h2>
+            <label for="login-username">Usuario</label>
+            <input type="text" id="login-username" name="login-username" required>
+            <label for="login-password">Contraseña</label>
+            <input type="password" id="login-password" name="login-password" required>
+            <button type="submit">Entrar</button>
+            <div class="message" id="login-message"></div>
+        </form>
+        <form id="register-form" autocomplete="off">
+            <h2>Registrarse</h2>
+            <label for="register-username">Usuario</label>
+            <input type="text" id="register-username" name="register-username" required>
+            <label for="register-email">Email</label>
+            <input type="email" id="register-email" name="register-email" required>
+            <label for="register-adress">Dirección</label>
+            <input type="text" id="register-adress" name="register-adress" required>
+            <label for="register-password">Contraseña</label>
+            <input type="password" id="register-password" name="register-password" required>
+            <label for="register-password2">Confirmar Contraseña</label>
+            <input type="password" id="register-password2" name="register-password2" required>
+            <button type="submit">Crear Cuenta</button>
+            <div class="message" id="register-message"></div>
+        </form>
+    </div>
+    <div id="modal_backdrop"></div>
 
     <button id="show-chat" class="floating-button">💬</button>
 

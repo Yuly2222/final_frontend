@@ -21,19 +21,6 @@ document.addEventListener('DOMContentLoaded', function() {
         loginForm.classList.remove('active');
     });
 
-    // Validación simple para login
-    loginForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        const user = document.getElementById('login-username').value.trim();
-        const pass = document.getElementById('login-password').value.trim();
-        const msg = document.getElementById('login-message');
-        if (user === "" || pass === "") {
-            msg.textContent = "Por favor, completa todos los campos.";
-        } else {
-            msg.textContent = "Inicio de sesión simulado (agrega backend).";
-        }
-    });
-
     // Registro: POST al backend
     registerForm.addEventListener('submit', function(e) {
         e.preventDefault();
@@ -81,3 +68,37 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+
+// Login: POST al backend
+const loginForm = document.getElementById('login-form');
+const loginMessage = document.getElementById('login-message');
+
+loginForm.addEventListener('submit', function(e) {
+    e.preventDefault();
+    const user = document.getElementById('login-username').value.trim();
+    const pass = document.getElementById('login-password').value;
+    loginMessage.textContent = '';
+
+    fetch('https://final-backend2-20lz.onrender.com/app1/login/', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({name: user, password: pass})
+    })
+    .then(res => {
+        if (!res.ok) throw new Error('Credenciales inválidas');
+        return res.json();
+    })
+    .then(data => {
+        // Guardar token en localStorage
+        localStorage.setItem('token', data.token);
+        loginMessage.style.color = 'green';
+        loginMessage.textContent = 'Login exitoso!';
+        window.location.href = 'parcial.html';
+    })
+    .catch(err => {
+        loginMessage.style.color = 'red';
+        loginMessage.textContent = err.message || 'Error en login';
+    });
+});
+
+

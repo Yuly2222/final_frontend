@@ -546,3 +546,236 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+function showUserInfo(user) {
+  document.getElementById('user-display').textContent = `Bienvenido, ${user.name}`;
+  document.querySelector('.login-btn').style.display = 'none';
+  document.getElementById('logout-btn').style.display = 'inline-block';
+}
+
+function hideUserInfo() {
+  document.getElementById('user-display').textContent = '';
+  document.querySelector('.login-btn').style.display = 'inline-block';
+  document.getElementById('logout-btn').style.display = 'none';
+}
+
+async function fetchUserProfile() {
+  const token = localStorage.getItem('token');
+  if (!token) {
+    hideUserInfo();
+    return;
+  }
+
+  try {
+    const res = await fetch('https://final-backend2-20lz.onrender.com/app1/profile/', {
+      headers: { 'Authorization': 'Token ' + token }
+    });
+    if (!res.ok) throw new Error('No autorizado');
+    const data = await res.json();
+    showUserInfo(data.user);
+  } catch {
+    localStorage.removeItem('token');
+    hideUserInfo();
+  }
+}
+
+// Logout
+document.getElementById('logout-btn').addEventListener('click', () => {
+  localStorage.removeItem('token');
+  hideUserInfo();
+  // Opcional: redirige a login o recarga la página
+  window.location.href = 'ulogin-register.html';
+});
+
+window.addEventListener('DOMContentLoaded', fetchUserProfile);
+
+document.addEventListener('DOMContentLoaded', () => {
+  const submitBtn = document.getElementById('submit-cart');
+  const modal = document.getElementById('login_container');
+  const backdrop = document.getElementById('modal_backdrop');
+
+  function showModal() {
+    modal.classList.add('active');
+    backdrop.classList.add('active');
+  }
+
+  function hideModal() {
+    modal.classList.remove('active');
+    backdrop.classList.remove('active');
+  }
+
+  // Cerrar modal si haces click fuera del modal
+  backdrop.addEventListener('click', hideModal);
+
+  // Si tienes un botón para cerrar dentro del modal, por ejemplo:
+  const closeBtn = document.getElementById('close-modal');
+  if (closeBtn) closeBtn.addEventListener('click', hideModal);
+
+  submitBtn.addEventListener('click', function(e) {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      e.preventDefault(); // Previene que el form se envíe
+      showModal();
+    }
+    // Si hay token, permite que el form se envíe normalmente
+  });
+});
+
+// Cambia entre las pestañas de login y registro
+document.addEventListener('DOMContentLoaded', function() {
+    const loginTab = document.getElementById('login-tab');
+    const registerTab = document.getElementById('register-tab');
+    const loginForm = document.getElementById('login-form');
+    const registerForm = document.getElementById('register-form');
+
+    // Mostrar formulario de login al hacer clic en la pestaña "Iniciar Sesión"
+    loginTab.addEventListener('click', function() {
+        loginTab.classList.add('active');
+        registerTab.classList.remove('active');
+        loginForm.classList.add('active');
+        registerForm.classList.remove('active');
+    });
+
+    // Mostrar formulario de registro al hacer clic en la pestaña "Registrarse"
+    registerTab.addEventListener('click', function() {
+        registerTab.classList.add('active');
+        loginTab.classList.remove('active');
+        registerForm.classList.add('active');
+        loginForm.classList.remove('active');
+    });
+
+    // Registro: POST al backend
+    registerForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const user = document.getElementById('register-username').value.trim();
+        const email = document.getElementById('register-email').value.trim();
+        const pass1 = document.getElementById('register-password').value;
+        const pass2 = document.getElementById('register-password2').value;
+        const msg = document.getElementById('register-message');
+
+        if (user === "" || email === "" || pass1 === "" || pass2 === "") {
+            msg.textContent = "Por favor, completa todos los campos.";
+            return;
+        }
+        if (pass1 !== pass2) {
+            msg.textContent = "Las contraseñas no coinciden.";
+            return;
+        }
+
+        // Construir el objeto para el backend
+        const data = {
+            name: user,
+            address: "Sin dirección",
+            contact: email,
+            buyer_score: "0"
+        };
+
+        fetch('https://final-backend2-20lz.onrender.com/app1/usuarios/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => {
+            if (response.ok) {
+                msg.style.color = "green";
+                msg.textContent = "¡Registro exitoso!";
+                registerForm.reset();
+            } else {
+                msg.textContent = "Error en el registro. Intenta de nuevo.";
+            }
+        })
+        .catch(() => {
+            msg.textContent = "No se pudo conectar al servidor.";
+        });
+    });
+});
+
+// Login: POST al backend
+const loginForm = document.getElementById('login-form');
+const loginMessage = document.getElementById('login-message');
+
+loginForm.addEventListener('submit', function(e) {
+    e.preventDefault();
+    const user = document.getElementById('login-username').value.trim();
+    const pass = document.getElementById('login-password').value;
+    loginMessage.textContent = '';
+
+    fetch('https://final-backend2-20lz.onrender.com/app1/login/', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({name: user, password: pass})
+    })
+    .then(res => {
+        if (!res.ok) throw new Error('Credenciales inválidas');
+        return res.json();
+    })
+    .then(data => {
+        // Guardar token en localStorage
+        localStorage.setItem('token', data.token);
+        loginMessage.style.color = 'green';
+        loginMessage.textContent = 'Login exitoso!';
+        window.location.href = 'parcial.html';
+    })
+    .catch(err => {
+        loginMessage.style.color = 'red';
+        loginMessage.textContent = err.message || 'Error en login';
+    });
+});
+
+submitBtn.addEventListener('click', function(e) {
+  const token = localStorage.getItem('token');
+  if (!token) {
+    e.preventDefault();
+
+    // Guarda carrito actual en localStorage
+    const cartList = document.getElementById('cart-list');
+    // Suponiendo que tienes <li> con info, guardamos el HTML
+    localStorage.setItem('savedCart', cartList.innerHTML);
+
+    showModal();
+
+  }
+});
+document.addEventListener('DOMContentLoaded', () => {
+  // Restaurar al cargar la página
+  const savedPrices = localStorage.getItem('savedPrices');
+  if (savedPrices) {
+    document.getElementById('prices').value = savedPrices;
+    localStorage.removeItem('savedPrices');
+  }
+
+  const savedProducts = localStorage.getItem('savedProducts');
+  if (savedProducts) {
+    document.getElementById('products').value = savedProducts;
+    localStorage.removeItem('savedProducts');
+  }
+
+  // Controlar submit del carrito
+  const submitBtn = document.getElementById('submit-cart'); // o el id correcto
+  const modal = document.getElementById('login_container');
+  const backdrop = document.getElementById('modal_backdrop');
+
+  function showModal() {
+    modal.classList.add('active');
+    backdrop.classList.add('active');
+  }
+
+  submitBtn.addEventListener('click', function(e) {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      e.preventDefault();
+
+      // Guardar justo antes de mostrar el modal
+      localStorage.setItem('savedPrices', document.getElementById('prices').value);
+      localStorage.setItem('savedProducts', document.getElementById('products').value);
+
+      showModal();
+    }
+  });
+
+  backdrop.addEventListener('click', () => {
+    modal.classList.remove('active');
+    backdrop.classList.remove('active');
+  });
+});
