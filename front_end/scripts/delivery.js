@@ -76,6 +76,7 @@ document.getElementById('checkoutForm').addEventListener('submit', function(even
     .then(response => {
         if (response.ok) {
             alert('Datos enviados correctamente a Google Sheet.');
+            goBack(); // Llama a la función para regresar a la página anterior
         } else {
             alert('Error al enviar los datos. Verifique la URL o los datos enviados.');
         }

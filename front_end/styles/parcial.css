@@ -678,4 +678,28 @@ form {
 #modal_backdrop.active {
   display: block;
 }
+/* Estilo para el botón de logout en el nav */
+#logout-btn, .logout-btn {
+    background: #181818;
+    color: #ffa600;
+    border: none;
+    padding: 8px 18px;
+    font-size: 1em;
+    font-family: 'Oswald', sans-serif;
+    font-weight: bold;
+    border-radius: 7px;
+    margin: 0;
+    margin-left: 8px;
+    cursor: pointer;
+    transition: background 0.3s, color 0.3s, transform 0.2s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+    vertical-align: middle;
+    display: inline-block;
+}
+
+#logout-btn:hover, .logout-btn:hover {
+    background: #630f05;
+    color: #fff;
+    transform: scale(1.07);
+}
 
