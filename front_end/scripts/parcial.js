@@ -23,21 +23,7 @@ burgerItems.forEach(item => {
 
   // Agregar elementos al carrito
   const cartList = document.getElementById('cart-list');
-  const addToCartButtons = document.querySelectorAll('.add-to-cart');
-  addToCartButtons.forEach(button => {
-    button.addEventListener('click', () => {
-      const burger = button.closest('.burger');
-      const name = burger.getAttribute('data-name');
-      const price = parseFloat(burger.getAttribute('data-price'));
-      
-      if (cart[name]) {
-        cart[name].quantity += 1;
-      } else {
-        cart[name] = { price: price, quantity: 1 };
-      }
-      updateCartList();
-    });
-  });
+ 
 
   // Actualiza la lista del carrito con precios y cantidades
   function updateCartList() {
@@ -259,43 +245,7 @@ document.getElementById("clear-cart").addEventListener("click", function() {
   updateCartMessage();
 });
 
-
-
 const cart = {}; // Objeto para almacenar los ítems del carrito
-
-
-document.addEventListener("DOMContentLoaded", function() {
-  document.getElementById('hid').addEventListener('submit', function(event) {
-    event.preventDefault();  // Prevent the form from submitting immediately
-
-    // Check if cart is empty or undefined
-    if (Object.keys(cart).length === 0) {
-      console.log("Cart is empty!");
-      return;
-    }
-
-    const totalPrice = calculateTotalPrice(); // Calculate the total price of the cart
-    document.getElementById('prices').value = totalPrice.toFixed(2); // Set the price field in the form
-
-    // Prepare the cart data (products and quantities) to send
-    let products = [];
-    for (const item in cart) {
-      const name = encodeURIComponent(item);  // Ensure product name is encoded properly
-      const quantity = cart[item].quantity;
-      products.push(`${name}=${quantity}`);
-    }
-    const productsString = products.join('|');  // Join product data with '|' separator
-
-    document.getElementById('products').value = productsString;  // Set the products field in the form
-
-    // Log form data for debugging
-    console.log("Submitting form with products:", productsString);
-    
-    // Now, submit the form after setting the hidden values
-    document.getElementById('hid').submit();
-  });
-});
-  
 
 // Función para calcular el precio total del carrito
 function calculateTotalPrice() {
@@ -468,21 +418,26 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const cartList = document.getElementById('cart-list');
   const cart = {};
+// Esto SÍ debe estar (delegación con verificación de login)
+burgerOptionsContainer.addEventListener('click', function(e) {
+  if (e.target.classList.contains('add-to-cart')) {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      showModal();
+      return; // No agrega al carrito si no está logueado
+    }
+    const burger = e.target.closest('.burger');
+    const name = burger.getAttribute('data-name');
+    const price = parseFloat(burger.getAttribute('data-price'));
 
-  burgerOptionsContainer.addEventListener('click', event => {
-      if (event.target && event.target.classList.contains('add-to-cart')) {
-          const burger = event.target.closest('.burger');
-          const name = burger.getAttribute('data-name');
-          const price = parseFloat(burger.getAttribute('data-price'));
-
-          if (cart[name]) {
-              cart[name].quantity += 1;
-          } else {
-              cart[name] = { price: price, quantity: 1 };
-          }
-          updateCartList();
-      }
-  });
+    if (cart[name]) {
+      cart[name].quantity += 1;
+    } else {
+      cart[name] = { price: price, quantity: 1 };
+    }
+    updateCartList();
+  }
+});
 
   function updateCartList() {
       cartList.innerHTML = "";
@@ -588,37 +543,6 @@ document.getElementById('logout-btn').addEventListener('click', () => {
 
 window.addEventListener('DOMContentLoaded', fetchUserProfile);
 
-document.addEventListener('DOMContentLoaded', () => {
-  const submitBtn = document.getElementById('submit-cart');
-  const modal = document.getElementById('login_container');
-  const backdrop = document.getElementById('modal_backdrop');
-
-  function showModal() {
-    modal.classList.add('active');
-    backdrop.classList.add('active');
-  }
-
-  function hideModal() {
-    modal.classList.remove('active');
-    backdrop.classList.remove('active');
-  }
-
-  // Cerrar modal si haces click fuera del modal
-  backdrop.addEventListener('click', hideModal);
-
-  // Si tienes un botón para cerrar dentro del modal, por ejemplo:
-  const closeBtn = document.getElementById('close-modal');
-  if (closeBtn) closeBtn.addEventListener('click', hideModal);
-
-  submitBtn.addEventListener('click', function(e) {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      e.preventDefault(); // Previene que el form se envíe
-      showModal();
-    }
-    // Si hay token, permite que el form se envíe normalmente
-  });
-});
 
 // Cambia entre las pestañas de login y registro
 document.addEventListener('DOMContentLoaded', function() {
@@ -723,59 +647,38 @@ loginForm.addEventListener('submit', function(e) {
     });
 });
 
-submitBtn.addEventListener('click', function(e) {
-  const token = localStorage.getItem('token');
-  if (!token) {
-    e.preventDefault();
+// Referencias al modal y backdrop
+const modal = document.getElementById('login_container');
+const backdrop = document.getElementById('modal_backdrop');
+function showModal() {
+  modal.classList.add('active');
+  backdrop.classList.add('active');
+}
+function hideModal() {
+  modal.classList.remove('active');
+  backdrop.classList.remove('active');
+}
+if (backdrop) backdrop.addEventListener('click', hideModal);
+const closeBtn = document.getElementById('close-modal');
+if (closeBtn) closeBtn.addEventListener('click', hideModal);
 
-    // Guarda carrito actual en localStorage
-    const cartList = document.getElementById('cart-list');
-    // Suponiendo que tienes <li> con info, guardamos el HTML
-    localStorage.setItem('savedCart', cartList.innerHTML);
-
-    showModal();
-
-  }
-});
-document.addEventListener('DOMContentLoaded', () => {
-  // Restaurar al cargar la página
-  const savedPrices = localStorage.getItem('savedPrices');
-  if (savedPrices) {
-    document.getElementById('prices').value = savedPrices;
-    localStorage.removeItem('savedPrices');
-  }
-
-  const savedProducts = localStorage.getItem('savedProducts');
-  if (savedProducts) {
-    document.getElementById('products').value = savedProducts;
-    localStorage.removeItem('savedProducts');
-  }
-
-  // Controlar submit del carrito
-  const submitBtn = document.getElementById('submit-cart'); // o el id correcto
-  const modal = document.getElementById('login_container');
-  const backdrop = document.getElementById('modal_backdrop');
-
-  function showModal() {
-    modal.classList.add('active');
-    backdrop.classList.add('active');
-  }
-
-  submitBtn.addEventListener('click', function(e) {
+// Evento para agregar al carrito con verificación de login
+burgerOptionsContainer.addEventListener('click', function(e) {
+  if (e.target.classList.contains('add-to-cart')) {
     const token = localStorage.getItem('token');
     if (!token) {
-      e.preventDefault();
-
-      // Guardar justo antes de mostrar el modal
-      localStorage.setItem('savedPrices', document.getElementById('prices').value);
-      localStorage.setItem('savedProducts', document.getElementById('products').value);
-
       showModal();
+      return; // No agrega al carrito si no está logueado
     }
-  });
+    const burger = e.target.closest('.burger');
+    const name = burger.getAttribute('data-name');
+    const price = parseFloat(burger.getAttribute('data-price'));
 
-  backdrop.addEventListener('click', () => {
-    modal.classList.remove('active');
-    backdrop.classList.remove('active');
-  });
+    if (cart[name]) {
+      cart[name].quantity += 1;
+    } else {
+      cart[name] = { price: price, quantity: 1 };
+    }
+    updateCartList();
+  }
 });
