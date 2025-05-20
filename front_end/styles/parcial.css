@@ -702,4 +702,99 @@ form {
     color: #fff;
     transform: scale(1.07);
 }
+/* Fondo general del contenedor de login */
+/* Contenedor general del formulario */
+#login_container {
+  background-color: #8c2525; /* Marrón oscuro */
+  color: white;
+  padding: 30px;
+  border-radius: 10px;
+  max-width: 500px;
+  margin: 50px auto;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  font-family: 'Oswald', sans-serif;
+}
+
+/* Título principal del formulario */
+#login_container h2 {
+  display: block;
+  color: #ffa500; /* Naranja */
+  margin-bottom: 20px;
+  font-size: 24px;
+  text-align: center;
+}
+
+/* Etiquetas (labels) de los campos */
+#login_container label {
+  display: block;
+  margin-top: 10px;
+  margin-bottom: 5px;
+  color: white;
+  font-weight: normal;
+}
+
+/* Campos de entrada */
+#login_container input {
+  width: 100%;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  margin-bottom: 15px;
+  font-size: 15px;
+}
+
+/* Botones de acción */
+#login_container button {
+  width: 100%;
+  background-color: black;
+  color: orange;
+  border: none;
+  padding: 10px;
+  font-size: 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+#login_container button:hover {
+  background-color: #222;
+}
+
+/* Centrado de mensajes */
+#login_container .message {
+  margin-top: 10px;
+  text-align: center;
+  font-size: 14px;
+  color: #ffa500;
+}
+#login-form h2,
+#register-form h2 {
+  display: block !important;
+  margin-bottom: 15px !important;
+  font-size: 24px !important;
+  color: #ffa500 !important;
+  text-align: center !important;
+}
+
+#login-form label,
+#register-form label {
+  display: block !important;
+  margin-top: 10px !important;
+  margin-bottom: 5px !important;
+  color: white !important;
+  font-weight: normal !important;
+}
+#register-form,
+#login-form {
+  display: block !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+}
+#register-form h2,
+#login-form h2,
+#register-form label,
+#login-form label {
+  display: block !important;
+}
+
 
