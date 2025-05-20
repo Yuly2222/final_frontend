@@ -1,0 +1,78 @@
+/* Centrar el contenido principal */
+main {
+    max-width: 900px;
+    margin: 120px auto 40px auto;
+    padding: 24px;
+    background: #232323;
+    border-radius: 12px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.18);
+}
+
+/* Título */
+main h1 {
+    color: #ffbb3e;
+    text-align: center;
+    margin-bottom: 32px;
+    font-family: 'Oswald', sans-serif;
+    letter-spacing: 1px;
+}
+
+/* Tabla de pedidos */
+#tabla-pedidos {
+    width: 100%;
+    border-collapse: collapse;
+    background: #181818;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.10);
+}
+
+#tabla-pedidos thead {
+    background: linear-gradient(to right, #222, #444);
+}
+
+#tabla-pedidos th, #tabla-pedidos td {
+    padding: 14px 18px;
+    text-align: center;
+    font-size: 1.05em;
+}
+
+#tabla-pedidos th {
+    color: #ffbb3e;
+    font-weight: bold;
+    border-bottom: 2px solid #d00;
+    letter-spacing: 0.5px;
+}
+
+#tabla-pedidos tbody tr {
+    border-bottom: 1px solid #333;
+    transition: background 0.2s;
+}
+
+#tabla-pedidos tbody tr:hover {
+    background: #292929;
+}
+
+#tabla-pedidos td {
+    color: #fff;
+}
+
+#tabla-pedidos td:last-child {
+    font-weight: bold;
+}
+
+#tabla-pedidos td[data-estado="Pendiente"] {
+    color: #ffbb3e;
+}
+
+#tabla-pedidos td[data-estado="Atendido"] {
+    color: #4caf50;
+}
+
+/* Mensaje de pedidos */
+#mensaje-pedidos {
+    text-align: center;
+    color: #ffa500;
+    margin-bottom: 18px;
+    font-size: 1.1em;
+}

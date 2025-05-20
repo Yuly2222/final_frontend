@@ -504,14 +504,17 @@ burgerOptionsContainer.addEventListener('click', function(e) {
 function showUserInfo(user) {
   document.getElementById('user-display').textContent = `Bienvenido, ${user.name}`;
   document.querySelector('.login-btn').style.display = 'none';
+  document.getElementById('consulta-pedidos-link').style.display = 'inline-block';
   document.getElementById('logout-btn').style.display = 'inline-block';
 }
 
 function hideUserInfo() {
   document.getElementById('user-display').textContent = '';
   document.querySelector('.login-btn').style.display = 'inline-block';
+  document.getElementById('consulta-pedidos-link').style.display = 'none';
   document.getElementById('logout-btn').style.display = 'none';
 }
+
 
 async function fetchUserProfile() {
   const token = localStorage.getItem('token');
