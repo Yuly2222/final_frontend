@@ -202,38 +202,6 @@ button {
     color: black; /* Cambia el color del texto al hacer hover */
 }
 
-/* _______________________Our Story_______________________ */
-.story-content {
-    background: linear-gradient(to right, #222, #E74C3C); /* Agrega un degradado */
-    display: flex; /* Permite alinear el contenido */
-    justify-content: space-between; /* Separa el contenido a los extremos */
-    align-items: center; /* Centra verticalmente */
-    position: relative; /* Para posicionar la imagen */
-}
-
-.story-image {
-    max-width: 20%; /* Aumenta el tamaño sin afectar la distribución */
-    position: absolute; /* Mantiene la estructura sin afectar otros elementos */
-    transform: scale(2); /* Aumenta la escala de la imagen */
-    right: 0; /* Mueve la imagen a la derecha */
-}
-
-.story-text {
-    max-width: 60%; /* Limita el ancho del contenido de texto */
-    text-align: right; /* Alinea el texto a la derecha */
-    display: flex; /* Permite alinear el texto y la imagen */
-    flex-direction: column; /* Apila el contenido verticalmente */
-}
-
-.story-text p {
-    margin-left: 20px; /* Separa el texto de la imagen */
-}
-
-.story-image img {
-    max-width: 80%; /* Permite que la imagen se adapte dentro del contenedor */
-    margin-top: -3.5rem; /* Ajusta la posición de la imagen */
-}
-
 /* _______________________Reservations_______________________ */
 #reservation {
     background: #222; /* Cambia el color de fondo */
