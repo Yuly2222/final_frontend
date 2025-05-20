@@ -2,50 +2,6 @@ window.addEventListener('DOMContentLoaded', async () => {
     const mensaje = document.getElementById('mensaje-pedidos');
     const tbody = document.querySelector('#tabla-pedidos tbody');
 
-    // Mostrar usuario logueado en el nav
-    async function fetchUserProfile() {
-        const token = localStorage.getItem('token');
-        const userDisplay = document.getElementById('user-display');
-        const logoutBtn = document.getElementById('logout-btn');
-        const loginBtn = document.querySelector('.login-btn');
-        if (!token) {
-            userDisplay.textContent = '';
-            logoutBtn.style.display = 'none';
-            loginBtn.style.display = 'inline-block';
-            return;
-        }
-        try {
-            const res = await fetch('https://final-backend2-20lz.onrender.com/app1/ordenes/', {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            if (res.status === 401 || res.status === 403) {
-                // Solo aquí borra el token
-                localStorage.removeItem('token');
-                throw new Error('Sesión expirada');
-            }
-            if (!res.ok) throw new Error('Error al obtener perfil');
-            const data = await res.json();
-            userDisplay.innerHTML = `<span class="user-welcome">Bienvenido, ${data.user.name}</span>`;
-            logoutBtn.style.display = 'inline-block';
-            loginBtn.style.display = 'none';
-        } catch (err) {
-            userDisplay.textContent = '';
-            logoutBtn.style.display = 'none';
-            loginBtn.style.display = 'inline-block';
-        }
-    }
-
-    // Logout
-    const logoutBtn = document.getElementById('logout-btn');
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', () => {
-            localStorage.removeItem('token');
-            window.location.href = 'parcial.html';
-        });
-    }
-
-    await fetchUserProfile();
-
     // Petición al backend para obtener pedidos del usuario
     const token = localStorage.getItem('token');
     if (!token) {
