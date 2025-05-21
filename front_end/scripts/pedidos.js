@@ -1,8 +1,6 @@
 window.addEventListener('DOMContentLoaded', async () => {
     const mensaje = document.getElementById('mensaje-pedidos');
     const tbody = document.querySelector('#tabla-pedidos tbody');
-
-    // Petición al backend para obtener pedidos del usuario
     const token = localStorage.getItem('token');
     if (!token) {
         mensaje.textContent = 'Debes iniciar sesión para ver tus pedidos.';
@@ -11,7 +9,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 
     try {
         const res = await fetch('https://final-backend2-20lz.onrender.com/app1/ordenes/', {
-            headers: { 'Authorization': `Bearer ${token}` }
+            headers: { 'Authorization': `Token ${token}` }
         });
         if (!res.ok) throw new Error('No se pudieron obtener los pedidos');
         const pedidos = await res.json();
@@ -21,24 +19,24 @@ window.addEventListener('DOMContentLoaded', async () => {
             return;
         }
 
-        // Limpiar mensaje y tabla
         mensaje.textContent = '';
         tbody.innerHTML = '';
 
         pedidos.forEach((pedido, idx) => {
             const tr = document.createElement('tr');
-            // Productos: puede ser un array o string, ajusta según tu backend
-            let productos = '';
-            if (Array.isArray(pedido.productos)) {
-                productos = pedido.productos.map(p => `${p.nombre} x${p.cantidad}`).join(', ');
-            } else {
-                productos = pedido.productos; // Si ya es string
-            }
+            // Construir la lista de productos
+            const productos = pedido.items.map(
+                item => `${item.menu_item_name} x${item.quantity}`
+            ).join(', ');
+
+            // Estado legible
+            const estado = pedido.status === 'pending' ? 'Pendiente' : 'Atendido';
+
             tr.innerHTML = `
-                <td>${pedido.numero || idx + 1}</td>
+                <td>${pedido.id || idx + 1}</td>
                 <td>${productos}</td>
-                <td>$${pedido.precio ? pedido.precio.toFixed(2) : '0.00'}</td>
-                <td>${pedido.estado === 'atendido' ? 'Atendido' : 'Pendiente'}</td>
+                <td>$${pedido.total_price ? pedido.total_price.toFixed(2) : '0.00'}</td>
+                <td data-estado="${estado}">${estado}</td>
             `;
             tbody.appendChild(tr);
         });

@@ -25,12 +25,15 @@ document.addEventListener('DOMContentLoaded', function() {
     registerForm.addEventListener('submit', function(e) {
         e.preventDefault();
         const user = document.getElementById('register-username').value.trim();
-        const email = document.getElementById('register-email').value.trim();
+        const address = document.getElementById('register-address') 
+            ? document.getElementById('register-address').value.trim() 
+            : "Sin dirección";
+        const contact = document.getElementById('register-email').value.trim();
         const pass1 = document.getElementById('register-password').value;
         const pass2 = document.getElementById('register-password2').value;
         const msg = document.getElementById('register-message');
 
-        if (user === "" || email === "" || pass1 === "" || pass2 === "") {
+        if (user === "" || contact === "" || pass1 === "" || pass2 === "") {
             msg.textContent = "Por favor, completa todos los campos.";
             return;
         }
@@ -42,9 +45,11 @@ document.addEventListener('DOMContentLoaded', function() {
         // Construir el objeto para el backend
         const data = {
             name: user,
-            address: "Sin dirección",
-            contact: email,
-            buyer_score: "0"
+            address: address,
+            contact: contact,
+            buyer_score: "0.00",
+            password: pass1,
+            is_staff: false
         };
 
         fetch('https://final-backend2-20lz.onrender.com/app1/usuarios/', {

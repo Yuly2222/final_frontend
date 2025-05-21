@@ -673,7 +673,7 @@ form {
 /* Fondo general del contenedor de login */
 /* Contenedor general del formulario */
 #login_container {
-  background-color: #8c2525; /* Marrón oscuro */
+  background-color: #1a1818; /* Marrón oscuro */
   color: white;
   padding: 30px;
   border-radius: 10px;
@@ -706,7 +706,7 @@ form {
   width: 100%;
   padding: 10px;
   border: none;
-  border-radius: 5px;
+  border-radius: 20px; /* Más redondeado */
   margin-bottom: 15px;
   font-size: 15px;
 }
@@ -714,7 +714,7 @@ form {
 /* Botones de acción */
 #login_container button {
   width: 100%;
-  background-color: black;
+  background-color: #630f05;
   color: orange;
   border: none;
   padding: 10px;
@@ -730,7 +730,7 @@ form {
 
 /* Centrado de mensajes */
 #login_container .message {
-  margin-top: 10px;
+  margin-top: 5px;
   text-align: center;
   font-size: 14px;
   color: #ffa500;
