@@ -28,31 +28,42 @@ burgerItems.forEach(item => {
   // Actualiza la lista del carrito con precios y cantidades
   function updateCartList() {
     cartList.innerHTML = ''; // Clear current list
-    let subtotal = 0;
-    for (const item in cart) {
-    const li = document.createElement('li'); // Create list item
-    li.innerHTML = `
-      ${item} - ${cart[item].quantity} x $${cart[item].price}
-      <br><button class="increase" data-item="${item}">+</button>
-      <button class="decrease" data-item="${item}">-</button>
-      <button class="remove" data-item="${item}">Remove</button>
-    `; // Agregar botones para aumentar, disminuir y eliminar en el InnerHTML
-    cartList.appendChild(li);
-    subtotal += cart[item].price * cart[item].quantity;
-    }
-    
-    let summary = document.getElementById('cart-summary');
-    // Si el carrito está vacío, mostrar mensaje de carrito vacío y ocultar resumen
-    if (subtotal === 0) {
-    if (summary) {
-      summary.remove();
-    }
-    document.getElementById("empty-cart-message").style.display = "block";
-    return;
-    }
-    
-    const deliveryFee = 5;  // Envío fijo de $5
-    const total = subtotal + deliveryFee; // Calcular total
+ let subtotal = 0;
+
+for (const item in cart) {
+  const li = document.createElement('li');
+  li.innerHTML = `
+    ${item} - ${cart[item].quantity} x $${cart[item].price}
+    <br><button class="increase" data-item="${item}">+</button>
+    <button class="decrease" data-item="${item}">-</button>
+    <button class="remove" data-item="${item}">Remove</button>
+  `;
+  cartList.appendChild(li);
+  subtotal += cart[item].price * cart[item].quantity;
+}
+
+let summary = document.getElementById('cart-summary');
+if (subtotal === 0) {
+  if (summary) {
+    summary.remove();
+  }
+  document.getElementById("empty-cart-message").style.display = "block";
+  return;
+}
+
+// No necesitas volver a declarar subtotal aquí ✅
+// subtotal = 0; ❌ ¡BORRAR ESTA LÍNEA!
+
+for (let item in cart) {
+  console.log(`Item: ${item}, Precio: ${cart[item].price}, Cantidad: ${cart[item].quantity}`);
+}
+
+const deliveryFee = 5;
+const total = subtotal + deliveryFee;
+document.getElementById('cart-total').innerText = `Total: $${subtotal.toFixed(2)}`;
+
+
+
     
     // Si no existe el resumen, crearlo y agregarlo después de la lista del carrito
     if (!summary) {
@@ -430,11 +441,15 @@ burgerOptionsContainer.addEventListener('click', function(e) {
     const name = burger.getAttribute('data-name');
     const price = parseFloat(burger.getAttribute('data-price'));
 
-    if (cart[name]) {
-      cart[name].quantity += 1;
-    } else {
-      cart[name] = { price: price, quantity: 1 };
-    }
+   if (cart[name]) {
+  cart[name].quantity += 1;
+} else {
+  cart[name] = {
+    quantity: 1,
+    price: price
+  };
+}
+
     updateCartList();
   }
 });
@@ -666,22 +681,34 @@ const closeBtn = document.getElementById('close-modal');
 if (closeBtn) closeBtn.addEventListener('click', hideModal);
 
 // Evento para agregar al carrito con verificación de login
-burgerOptionsContainer.addEventListener('click', function(e) {
-  if (e.target.classList.contains('add-to-cart')) {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      showModal();
-      return; // No agrega al carrito si no está logueado
-    }
-    const burger = e.target.closest('.burger');
-    const name = burger.getAttribute('data-name');
-    const price = parseFloat(burger.getAttribute('data-price'));
+// 🎯 Evento para agregar al carrito con verificación de login
+burgerOptionsContainer.addEventListener('click', function (e) {
+    if (e.target.classList.contains('add-to-cart')) {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            showModal(); // Mostrar ventana de login si no hay token
+            return;
+        }
 
-    if (cart[name]) {
-      cart[name].quantity += 1;
-    } else {
-      cart[name] = { price: price, quantity: 1 };
+        const burger = e.target.closest('.burger');
+        const name = burger.getAttribute('data-name');
+        const priceRaw = burger.getAttribute('data-price');
+        const price = parseFloat(priceRaw);
+
+        // 🛑 Validar si el precio se leyó correctamente
+        if (isNaN(price)) {
+            alert("ERROR: El precio no se está leyendo correctamente.");
+            console.log("Valor inválido encontrado en data-price:", priceRaw);
+            return;
+        }
+
+        // ✅ Agregar al carrito
+        if (cart[name]) {
+            cart[name].quantity += 1;
+        } else {
+            cart[name] = { price: price, quantity: 1 };
+        }
+
+        updateCartList(); // Refrescar carrito visualmente
     }
-    updateCartList();
-  }
 });

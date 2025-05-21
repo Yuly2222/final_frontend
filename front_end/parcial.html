@@ -79,22 +79,27 @@
     </form>
 
     <!-- Shopping Cart -->
-    <section id="floating-cart">
-        <div id="cart-container" class="floating-section">
-            <h3>Shopping Cart</h3>
-            <br><p id="empty-cart-message">Your cart is empty. Add some delicious items!</p>
-            <ul id="cart-list"></ul>
-            <form id="hid" action="delivery.html" method="get">
-                <input type="hidden" id="prices" name="prices" value="">
-                <input type="hidden" id="products" name="products" value="">
-                <button id="clear-cart">Clear Cart</button>
-                <button type="submit" id="submit-cart">Submit</button>
-            </form>
-            <script>
-                const deliveryUrl = "delivery.html";
-            </script>
-        </div>
-    </section>
+<!-- Shopping Cart -->
+<section id="floating-cart">
+    <div id="cart-container" class="floating-section">
+        <h3>Shopping Cart</h3>
+        <br>
+        <p id="empty-cart-message">Your cart is empty. Add some delicious items!</p>
+        <ul id="cart-list"></ul>
+        <!-- Aquí añadimos el contenedor para el total -->
+        <div id="cart-total">Total: $0.00</div>
+        <form id="hid" action="delivery.html" method="get">
+            <input type="hidden" id="prices" name="prices" value="">
+            <input type="hidden" id="products" name="products" value="">
+            <button id="clear-cart">Clear Cart</button>
+            <button type="submit" id="submit-cart">Submit</button>
+        </form>
+        <script>
+            const deliveryUrl = "delivery.html";
+        </script>
+    </div>
+</section>
+
 
     <button id="show-cart" class="floating-button">🛒</button>
 
