@@ -43,5 +43,29 @@ window.addEventListener('DOMContentLoaded', async () => {
     } catch (err) {
         mensaje.textContent = 'Error al cargar tus pedidos.';
     }
+
+    // Verificar si el usuario es staff y mostrar/ocultar el enlace
+    const consultaTodosLink = document.getElementById('consultatodoslink');
+    if (token && consultaTodosLink) {
+        try {
+            // Pide el perfil del usuario autenticado
+            const res = await fetch('https://final-backend2-20lz.onrender.com/app1/profile/', {
+                headers: { 'Authorization': `Token ${token}` }
+            });
+            if (res.ok) {
+                const user = await res.json();
+                // Si el usuario NO es staff, oculta el enlace
+                if (user.is_staff === false) {
+                    consultaTodosLink.style.display = 'none';
+                } else {
+                    consultaTodosLink.style.display = 'inline-block';
+                }
+            } else {
+                consultaTodosLink.style.display = 'none';
+            }
+        } catch (err) {
+            consultaTodosLink.style.display = 'none';
+        }
+    }
 });
 
