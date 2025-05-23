@@ -81,7 +81,7 @@ window.addEventListener('DOMContentLoaded', async () => {
             tdEstado.textContent = 'Atendido';
             tdEstado.style.color = 'green';
             tdEstado.style.fontWeight = 'bold';
-        } else {
+        } else if (isStaff && status === 'pending') {
             const btn = document.createElement('button');
             btn.textContent = 'Marcar como enviado';
             btn.classList.add('deliver-btn');
@@ -90,6 +90,9 @@ window.addEventListener('DOMContentLoaded', async () => {
             btn.style.color = 'black';
             btn.style.fontWeight = 'bold';
             btn.style.border = '2px solid red';
+            btn.style.borderRadius = '5px';
+            btn.style.padding = '4px 10px';
+            btn.style.cursor = 'pointer';
             btn.addEventListener('click', async () => {
                 btn.disabled = true;
                 try {
@@ -114,9 +117,44 @@ window.addEventListener('DOMContentLoaded', async () => {
                 }
             });
             tdEstado.appendChild(btn);
+        } else {
+            tdEstado.textContent = '';
         }
 
-        tr.append(tdId, tdCliente, tdProductos, tdTotal, tdEstado);
+        // Botón eliminar (columna pequeña)
+        const tdDelete = document.createElement('td');
+        const btnDelete = document.createElement('button');
+        btnDelete.textContent = '✗';
+        btnDelete.title = 'Eliminar pedido';
+        btnDelete.style.background = 'transparent';
+        btnDelete.style.color = 'red';
+        btnDelete.style.fontWeight = 'bold';
+        btnDelete.style.border = 'none';
+        btnDelete.style.cursor = 'pointer';
+        btnDelete.addEventListener('click', async () => {
+            if (confirm('¿Seguro que deseas eliminar este pedido?')) {
+                btnDelete.disabled = true;
+                try {
+                    const delRes = await fetch(
+                        `https://final-backend2-20lz.onrender.com/app1/ordenes/${pedido.id}/`,
+                        {
+                            method: 'DELETE',
+                            headers: {
+                                'Authorization': `Token ${token}`
+                            }
+                        }
+                    );
+                    if (!delRes.ok) throw new Error();
+                    tr.remove();
+                } catch {
+                    btnDelete.disabled = false;
+                    alert('No se pudo eliminar el pedido.');
+                }
+            }
+        });
+        tdDelete.appendChild(btnDelete);
+
+        tr.append(tdId, tdCliente, tdProductos, tdTotal, tdEstado, tdDelete);
         tbody.appendChild(tr);
     });
 });
