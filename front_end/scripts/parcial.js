@@ -460,7 +460,16 @@ function updateCartList() {
 
   for (const [name, item] of Object.entries(cart)) {
     const listItem = document.createElement("li");
-    listItem.textContent = `${name} - ${item.quantity} x $${item.price.toFixed(2)}`;
+ listItem.innerHTML = `
+  ${name} - ${item.quantity} x $${item.price.toFixed(2)}<br>
+  <div class="button-group">
+    <button class="increase" data-name="${name}">+</button>
+    <button class="decrease" data-name="${name}">-</button>
+    <button class="remove" data-name="${name}">🗑</button>
+  </div>
+`;
+
+
     cartList.appendChild(listItem);
 
     subtotal += item.quantity * item.price;
@@ -477,6 +486,24 @@ function updateCartList() {
   // Mostrar total
   document.getElementById("cart-total").innerText = `Total: $${subtotal.toFixed(2)}`;
 }
+// Manejar clics en botones +, - y 🗑 dentro del carrito
+cartList.addEventListener("click", (e) => {
+  const name = e.target.dataset.name;
+  if (!name) return;
+
+  if (e.target.classList.contains("increase")) {
+    cart[name].quantity += 1;
+  } else if (e.target.classList.contains("decrease")) {
+    cart[name].quantity -= 1;
+    if (cart[name].quantity <= 0) {
+      delete cart[name];
+    }
+  } else if (e.target.classList.contains("remove")) {
+    delete cart[name];
+  }
+
+  updateCartList();
+});
 
 
   // Clear Cart - Remove items and flush localStorage
