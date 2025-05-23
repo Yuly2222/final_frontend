@@ -2,6 +2,10 @@
 const queryParams = new URLSearchParams(window.location.search);
 const totalPrice = queryParams.get('prices'); // string
 const productsString = queryParams.get('products'); // string
+const idsString = queryParams.get('ids'); // <-- Nuevo: ids separados por coma
+
+// Convierte los IDs a un array de números
+const productIds = idsString ? idsString.split(',').map(id => parseInt(id)) : [];
 
 document.addEventListener('DOMContentLoaded', function() {
     // Show the total price in the corresponding field
@@ -49,7 +53,6 @@ document.getElementById('checkoutForm').addEventListener('submit', async functio
     // 1. Obtener datos del usuario autenticado
     const token = localStorage.getItem('token');
     let user_id = null;
-    let user_name = null;
     if (token) {
         try {
             const res = await fetch('https://final-backend2-20lz.onrender.com/app1/profile/', {
@@ -58,7 +61,6 @@ document.getElementById('checkoutForm').addEventListener('submit', async functio
             if (res.ok) {
                 const user = await res.json();
                 user_id = user.id;
-                user_name = user.name;
             }
         } catch (err) {
             alert('No se pudo obtener el usuario. Inicia sesión.');
@@ -69,42 +71,31 @@ document.getElementById('checkoutForm').addEventListener('submit', async functio
         return;
     }
 
-    // 2. Obtener productos únicamente de la URL (ya están arriba)
+    // 2. Obtener productos y cantidades de la URL
     let items = [];
-    let total_price = 0;
-
-    // Usa las variables globales
-    if (!productsString) {
-        alert('El carrito está vacío.');
+    if (!productsString || !idsString) {
+        alert('El carrito está vacío o faltan los IDs.');
         return;
     }
 
     const products = productsString.split('|').filter(Boolean);
-    const totalPriceFloat = parseFloat(totalPrice || "0");
 
     products.forEach((product, idx) => {
-        const [name, quantity] = product.split('=');
-        const decodedName = decodeURIComponent(name);
+        const [, quantity] = product.split('=');
         const qty = parseInt(quantity);
-        const unitPrice = parseFloat((totalPriceFloat / products.length).toFixed(2));
-        const subtotal = parseFloat((unitPrice * qty).toFixed(2));
-        items.push({
-            menu_item_id: null, // O pon el ID si lo tienes
-            menu_item_name: decodedName,
-            menu_item_price: unitPrice,
-            quantity: qty,
-            subtotal: subtotal
-        });
+        const menu_item_id = productIds[idx]; // El ID viene de la URL
+        if (menu_item_id) {
+            items.push({
+                menu_item_id: menu_item_id,
+                quantity: qty
+            });
+        }
     });
-    total_price = items.reduce((sum, item) => sum + item.subtotal, 0);
 
-    // 3. Construir el objeto del pedido
+    // 3. Construir el objeto del pedido en el formato solicitado
     const pedido = {
         user_id: user_id,
-        user_name: user_name,
         datetime: new Date().toISOString(),
-        total_price: total_price,
-        status: "pending",
         items: items
     };
 
