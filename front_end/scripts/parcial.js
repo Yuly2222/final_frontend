@@ -454,14 +454,30 @@ burgerOptionsContainer.addEventListener('click', function(e) {
   }
 });
 
-  function updateCartList() {
-      cartList.innerHTML = "";
-      for (const [name, item] of Object.entries(cart)) {
-          const listItem = document.createElement("li");
-          listItem.textContent = `${name} - ${item.quantity} x $${item.price.toFixed(2)}`;
-          cartList.appendChild(listItem);
-      }
+function updateCartList() {
+  cartList.innerHTML = "";
+  let subtotal = 0;
+
+  for (const [name, item] of Object.entries(cart)) {
+    const listItem = document.createElement("li");
+    listItem.textContent = `${name} - ${item.quantity} x $${item.price.toFixed(2)}`;
+    cartList.appendChild(listItem);
+
+    subtotal += item.quantity * item.price;
   }
+
+  // Mostrar u ocultar el mensaje de carrito vacío
+  const emptyMessage = document.getElementById("empty-cart-message");
+  if (subtotal === 0) {
+    emptyMessage.style.display = "block";
+  } else {
+    emptyMessage.style.display = "none";
+  }
+
+  // Mostrar total
+  document.getElementById("cart-total").innerText = `Total: $${subtotal.toFixed(2)}`;
+}
+
 
   // Clear Cart - Remove items and flush localStorage
   const clearCartButton = document.getElementById("clear-cart");
