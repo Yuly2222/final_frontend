@@ -49,66 +49,52 @@ window.addEventListener('DOMContentLoaded', async () => {
     mensaje.textContent = '';
     tbody.innerHTML = '';
 
-    // 4) Construyo filas
+    // 4) Construyo filas con columnas fijas
     pedidos.forEach(pedido => {
         const tr = document.createElement('tr');
 
-        // ID
+        // N° Pedido
         const tdId = document.createElement('td');
         tdId.textContent = pedido.id;
 
         // Cliente
-        const user = usuarios.find(u => u.id === pedido.user);
+        const user = usuarios.find(u => u.id === pedido.user_id);
         const tdCliente = document.createElement('td');
-        tdCliente.textContent = user
-            ? `${user.first_name || ''} ${user.last_name || ''}`.trim() || user.username
-            : '—';
+        tdCliente.textContent = user ? user.name : '—';
 
         // Productos
         const tdProductos = document.createElement('td');
-        tdProductos.textContent = pedido.items
-            .map(item => `${item.menu_item_name} x${item.quantity}`)
-            .join(', ');
+        tdProductos.textContent = Array.isArray(pedido.items) && pedido.items.length > 0
+            ? pedido.items.map(item => `${item.menu_item_name} x${item.quantity}`).join(', ')
+            : '—';
 
-        // Total
+        // Precio
         const tdTotal = document.createElement('td');
         tdTotal.textContent = `$${(pedido.total_price || 0).toFixed(2)}`;
 
-        // Estado
+        // Estado (con botón si es staff y pendiente)
         const tdEstado = document.createElement('td');
-        const estadoTexto = pedido.status === 'pending' ? 'Pendiente' : 'Atendido';
-        tdEstado.textContent = estadoTexto;
-        tdEstado.dataset.estado = estadoTexto;
-        tdEstado.style.color = pedido.status === 'pending' ? 'orange' : 'green';
-        tdEstado.style.fontWeight = 'bold';
+        tdEstado.dataset.estado = pedido.status;
+        const status = (pedido.status || '').toLowerCase().trim();
 
-        tr.append(tdId, tdCliente, tdProductos, tdTotal, tdEstado);
-
-        // Acción (solo staff y si está pendiente)
-        if (isStaff) {
-            const tdAccion = document.createElement('td');
-            if (pedido.status === 'pending') {
-                const btn = document.createElement('button');
-                btn.textContent = 'Marcar como enviado';
-                btn.classList.add('deliver-btn');
-                btn.dataset.id = pedido.id;
-                tdAccion.appendChild(btn);
-            }
-            tr.appendChild(tdAccion);
-        }
-
-        tbody.appendChild(tr);
-    });
-
-    // 5) Handler para marcar como delivered
-    if (isStaff) {
-        tbody.querySelectorAll('.deliver-btn').forEach(btn => {
+        if (status === 'delivered') {
+            tdEstado.textContent = 'Atendido';
+            tdEstado.style.color = 'green';
+            tdEstado.style.fontWeight = 'bold';
+        } else {
+            const btn = document.createElement('button');
+            btn.textContent = 'Marcar como enviado';
+            btn.classList.add('deliver-btn');
+            btn.dataset.id = pedido.id;
+            btn.style.background = 'orange';
+            btn.style.color = 'black';
+            btn.style.fontWeight = 'bold';
+            btn.style.border = '2px solid red';
             btn.addEventListener('click', async () => {
-                const orderId = btn.dataset.id;
                 btn.disabled = true;
                 try {
                     const putRes = await fetch(
-                        `https://final-backend2-20lz.onrender.com/app1/ordenes/${orderId}/`,
+                        `https://final-backend2-20lz.onrender.com/app1/ordenes/${pedido.id}/`,
                         {
                             method: 'PUT',
                             headers: {
@@ -119,18 +105,18 @@ window.addEventListener('DOMContentLoaded', async () => {
                         }
                     );
                     if (!putRes.ok) throw new Error();
-                    // Actualizo UI
-                    const row = btn.closest('tr');
-                    const estadoCell = row.querySelector('td[data-estado]');
-                    estadoCell.textContent = 'Atendido';
-                    estadoCell.dataset.estado = 'Atendido';
-                    estadoCell.style.color = 'green';
-                    btn.remove();
+                    tdEstado.textContent = 'Atendido';
+                    tdEstado.style.color = 'green';
+                    tdEstado.style.fontWeight = 'bold';
                 } catch {
                     btn.disabled = false;
                     alert('No se pudo actualizar el estado.');
                 }
             });
-        });
-    }
+            tdEstado.appendChild(btn);
+        }
+
+        tr.append(tdId, tdCliente, tdProductos, tdTotal, tdEstado);
+        tbody.appendChild(tr);
+    });
 });
