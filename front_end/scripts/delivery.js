@@ -75,49 +75,39 @@ document.getElementById('checkoutForm').addEventListener('submit', async functio
         return;
     }
 
-    // 2. Obtener productos del carrito (localStorage o query string)
+    // 2. Obtener productos únicamente de la URL
     let items = [];
     let total_price = 0;
-    let cart = JSON.parse(localStorage.getItem('cart') || '[]');
 
-    if (cart.length > 0) {
-        // Si hay carrito en localStorage, úsalo
-        items = cart.map(item => ({
-            menu_item_id: item.menu_item_id,
-            menu_item_name: item.menu_item_name,
-            menu_item_price: item.menu_item_price,
-            quantity: item.quantity,
-            subtotal: item.menu_item_price * item.quantity
-        }));
-        total_price = items.reduce((sum, item) => sum + item.subtotal, 0);
-    } else {
-        // Si el carrito está vacío, intenta leer de la URL
-        const queryParams = new URLSearchParams(window.location.search);
-        const totalPrice = parseFloat(queryParams.get('prices')) || 0;
-        const productsString = queryParams.get('products');
-        if (!productsString) {
-            alert('El carrito está vacío.');
-            return;
-        }
-        // Ejemplo de productsString: "Veggie=3"
-        const products = productsString.split('|');
-        items = products.map(product => {
-            const [name, quantity] = product.split('=');
-            // Aquí debes poner el precio real del producto, si lo tienes.
-            // Si solo tienes el precio total, distribúyelo entre los productos.
-            // Mejor aún: si puedes pasar el precio de cada producto en el query string, ¡hazlo!
-            // Por ahora, lo distribuimos:
-            const pricePerUnit = totalPrice / products.length / parseInt(quantity);
-            return {
-                menu_item_id: null, // Si tienes el ID, agrégalo aquí
-                menu_item_name: decodeURIComponent(name),
-                menu_item_price: pricePerUnit,
-                quantity: parseInt(quantity),
-                subtotal: pricePerUnit * parseInt(quantity)
-            };
-        });
-        total_price = items.reduce((sum, item) => sum + item.subtotal, 0);
+    const queryParams = new URLSearchParams(window.location.search);
+    const productsString = queryParams.get('products');
+    const totalPrice = parseFloat(queryParams.get('prices') || "0");
+
+    // Si tienes los IDs de los productos, ponlos aquí en el mismo orden que en el string del URL
+    const productIds = [/* 5, 6, ... */];
+
+    if (!productsString) {
+        alert('El carrito está vacío.');
+        return;
     }
+
+    const products = productsString.split('|').filter(Boolean);
+
+    products.forEach((product, idx) => {
+        const [name, quantity] = product.split('=');
+        const decodedName = decodeURIComponent(name);
+        const qty = parseInt(quantity);
+        const unitPrice = parseFloat((totalPrice / products.length).toFixed(2));
+        const subtotal = parseFloat((unitPrice * qty).toFixed(2));
+        items.push({
+            menu_item_id: productIds[idx] || null, // Si tienes el ID, lo pone, si no, null
+            menu_item_name: decodedName,
+            menu_item_price: unitPrice,
+            quantity: qty,
+            subtotal: subtotal
+        });
+    });
+    total_price = items.reduce((sum, item) => sum + item.subtotal, 0);
 
     if (items.length === 0) {
         alert('El carrito está vacío.');
@@ -146,8 +136,6 @@ document.getElementById('checkoutForm').addEventListener('submit', async functio
         });
         if (res.ok) {
             alert('¡Pedido realizado con éxito!');
-            // Limpia el carrito si quieres
-            localStorage.removeItem('cart');
             window.location.href = 'pedidos.html';
         } else {
             alert('Error al enviar el pedido.');
