@@ -81,7 +81,7 @@ window.addEventListener('DOMContentLoaded', async () => {
             tdEstado.textContent = 'Atendido';
             tdEstado.style.color = 'green';
             tdEstado.style.fontWeight = 'bold';
-        } else if (isStaff && status === 'pending') {
+        } else {
             const btn = document.createElement('button');
             btn.textContent = 'Marcar como enviado';
             btn.classList.add('deliver-btn');
@@ -117,8 +117,6 @@ window.addEventListener('DOMContentLoaded', async () => {
                 }
             });
             tdEstado.appendChild(btn);
-        } else {
-            tdEstado.textContent = '';
         }
 
         // Botón eliminar (columna pequeña)
@@ -144,6 +142,8 @@ window.addEventListener('DOMContentLoaded', async () => {
                             }
                         }
                     );
+                    const text = await delRes.text();
+                    console.log('DELETE status:', delRes.status, 'response:', text);
                     if (!delRes.ok) throw new Error();
                     tr.remove();
                 } catch {
