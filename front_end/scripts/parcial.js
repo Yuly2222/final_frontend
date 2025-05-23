@@ -282,10 +282,17 @@ document.addEventListener("DOMContentLoaded", () => {
   const burgerOptionsContainer = document.getElementById("burger-options");
   const loadingMessage = document.getElementById("loading-message");
 
+  const nameToId = {}
+
   fetch(apiUrl)
       .then(response => response.json())
       .then(json => {
           const items = json.data || json.items || json; 
+          items.forEach(item => {
+              if (item.name) {
+                  nameToId[item.name] = item.id;
+              }
+          });
           console.log("Datos recibidos:", items);
 
           if (!items || items.length === 0) {
@@ -530,18 +537,22 @@ cartList.addEventListener("click", (e) => {
 
     // Create a string of product details (name=quantity)
     let products = [];
+    let ids = [];
     for (const item in cart) {
-        const name = encodeURIComponent(item); // Make sure the product name is URL-safe
+        const name = encodeURIComponent(item); // URL-safe
         const quantity = cart[item].quantity;
         products.push(`${name}=${quantity}`);
+        if (nameToId[item]) {
+            ids.push(nameToId[item]);
+        }
     }
     const productsString = products.join('|'); // Use '|' as a separator
-
-    // Update the hidden products field
+    const idsString = ids.join(',');
+    
     document.getElementById('products').value = productsString;
 
-    // Construct the full URL with query parameters (without ".html")
-    const fullUrl = `${deliveryUrl}?prices=${totalPrice.toFixed(2)}&products=${productsString}`;
+    // Construct the full URL with query parameters (agrega &ids=)
+    const fullUrl = `${deliveryUrl}?prices=${totalPrice.toFixed(2)}&products=${productsString}&ids=${idsString}`;
 
     // Now redirect to the dynamically generated URL
     window.location.href = fullUrl;
