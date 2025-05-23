@@ -281,17 +281,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const groupsContainer = document.getElementById("groups");
   const burgerOptionsContainer = document.getElementById("burger-options");
   const loadingMessage = document.getElementById("loading-message");
-  const nameToId = {}; // Llénalo cuando haces fetch del menú
 
   fetch(apiUrl)
       .then(response => response.json())
       .then(json => {
           const items = json.data || json.items || json; 
-          items.forEach(item => {
-              if (item.name) {
-                  nameToId[item.name] = item.id;
-              }
-          });
           console.log("Datos recibidos:", items);
 
           if (!items || items.length === 0) {
@@ -491,25 +485,20 @@ burgerOptionsContainer.addEventListener('click', function(e) {
     // Update the hidden price field
     document.getElementById('prices').value = totalPrice.toFixed(2);
 
-    // Create a string of product details (name=quantity) y un array de IDs
+    // Create a string of product details (name=quantity)
     let products = [];
-    let ids = [];
     for (const item in cart) {
-        const name = encodeURIComponent(item); // URL-safe
+        const name = encodeURIComponent(item); // Make sure the product name is URL-safe
         const quantity = cart[item].quantity;
         products.push(`${name}=${quantity}`);
-        if (nameToId[item]) {
-            ids.push(nameToId[item]);
-        }
     }
     const productsString = products.join('|'); // Use '|' as a separator
-    const idsString = ids.join(','); // IDs separados por coma
 
     // Update the hidden products field
     document.getElementById('products').value = productsString;
 
-    // Construct the full URL with query parameters (agrega &ids=)
-    const fullUrl = `${deliveryUrl}?prices=${totalPrice.toFixed(2)}&products=${productsString}&ids=${idsString}`;
+    // Construct the full URL with query parameters (without ".html")
+    const fullUrl = `${deliveryUrl}?prices=${totalPrice.toFixed(2)}&products=${productsString}`;
 
     // Now redirect to the dynamically generated URL
     window.location.href = fullUrl;
