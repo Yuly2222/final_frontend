@@ -61,9 +61,27 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .then(response => {
             if (response.ok) {
-                msg.style.color = "green";
-                msg.textContent = "¡Registro exitoso!";
-                registerForm.reset();
+                // Registro exitoso, ahora hacer login automático
+                fetch('https://final-backend2-20lz.onrender.com/app1/login/', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({name: user, password: pass1})
+                })
+                .then(res => {
+                    if (!res.ok) throw new Error('Error al iniciar sesión automáticamente');
+                    return res.json();
+                })
+                .then(data => {
+                    localStorage.setItem('token', data.token);
+                    msg.style.color = "green";
+                    msg.textContent = "¡Registro y login exitosos!";
+                    registerForm.reset();
+                    window.location.href = 'parcial.html';
+                })
+                .catch(() => {
+                    msg.style.color = "red";
+                    msg.textContent = "Registro exitoso, pero error al iniciar sesión.";
+                });
             } else {
                 msg.textContent = "Error en el registro. Intenta de nuevo.";
             }
